@@ -1,6 +1,6 @@
 package com.genesislab.gtube.dto;
 
-import java.util.Set;
+import com.genesislab.gtube.entity.Role;
 import lombok.Builder;
 import lombok.Data;
 
@@ -12,5 +12,9 @@ public class UserDto {
     private String email;
     private String name;
     private String phone;
-    private Set<String> roles;
+    private String role;
+
+    public Role getRoleAsEnum() {
+        return Role.valueOf(role);
+    }
 }

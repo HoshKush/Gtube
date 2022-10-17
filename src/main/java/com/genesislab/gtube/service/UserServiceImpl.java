@@ -1,14 +1,10 @@
 package com.genesislab.gtube.service;
 
 import com.genesislab.gtube.dto.UserDto;
-import com.genesislab.gtube.entity.Role;
 import com.genesislab.gtube.entity.User;
-import com.genesislab.gtube.repository.RoleRepository;
 import com.genesislab.gtube.repository.UserRepository;
-import java.util.Set;
-import java.util.stream.Collectors;
+import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.User.UserBuilder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -18,7 +14,6 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -26,15 +21,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void save(UserDto userDto) {
+    @Transactional
+    public void insert(UserDto userDto) {
         userRepository.save(
-                buildEntityFrom(userDto)
+                User.from(userDto)
         );
     }
 
     @Override
+    @Transactional
     public void update(UserDto userDto) {
-
+        User user = findById(userDto.getId());
+        if(userDto.getName() != null) user.setName(userDto.getName());
+        if(userDto.getPhone() != null) user.setPhone(userDto.getName());
+        if(userDto.getRole() != null) ;
     }
 
     @Override
@@ -43,22 +43,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto findById(Long id) {
-        return null;
+    public User findById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
     }
 
-    public User buildEntityFrom(UserDto dto) {
-        Set<Role> roles = dto.getRoles().stream()
-                .map(roleRepository::findByName)
-                .collect(Collectors.toSet());
-
-        return User.builder()
-                .name(dto.getName())
-                .phone(dto.getPhone())
-                .email(dto.getEmail())
-                .password(dto.getPassword())
-                .roles(roles)
-                .build();
+    public boolean exists(UserDto userDto) {
+        return userRepository.findByEmail(userDto.getEmail()) != null;
     }
 
 }

@@ -1,14 +1,8 @@
 package com.genesislab.gtube.service;
 
 import com.genesislab.gtube.dto.UserDto;
-import com.genesislab.gtube.entity.Role;
-import com.genesislab.gtube.entity.RoleEnum;
 import com.genesislab.gtube.entity.User;
-import com.genesislab.gtube.repository.RoleRepository;
 import com.genesislab.gtube.repository.UserRepository;
-import java.util.Arrays;
-import java.util.Set;
-import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,7 +14,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 class UserServiceImplTest {
 
     @Autowired private UserRepository userRepository;
-    @Autowired private RoleRepository roleRepository;
     @Autowired private UserService userService;
 
     static UserDto userDtoForTest = UserDto.builder()
@@ -28,26 +21,18 @@ class UserServiceImplTest {
                     .name("2222")
                     .phone("3333")
                     .password("4444")
-                    .roles(Arrays.stream(RoleEnum.values()).map(RoleEnum::name).collect(Collectors.toSet()))
+                    .role("USER")
                     .build();
 
     @BeforeEach
     void init() throws Exception {
-        insertRolesToDB();
         createUserForTest();
     }
 
-    void insertRolesToDB() throws Exception {
-        for(RoleEnum role : RoleEnum.values()) {
-            if(roleRepository.findByName(role.name()) == null) {
-                roleRepository.save(Role.builder().name(role.name()).build());
-            }
-        }
-    }
 
     private void createUserForTest() {
         User test = userRepository.save(
-                userService.buildEntityFrom(userDtoForTest)
+                User.from(userDtoForTest)
         );
 
         if(userRepository.findByEmail(userDtoForTest.getEmail()) == null) {
@@ -64,11 +49,11 @@ class UserServiceImplTest {
                 .name("2222")
                 .phone("3333")
                 .password("4444")
-                .roles(Arrays.stream(RoleEnum.values()).map(RoleEnum::name).collect(Collectors.toSet()))
+                .role("USER")
                 .build();
 
         //when
-        userService.save(userDto);
+        userService.insert(userDto);
 
         //then
         User actual = userRepository.findByEmail(userDto.getEmail());
@@ -87,23 +72,16 @@ class UserServiceImplTest {
     void 회원정보수정_성공() throws Exception{
         //given
         UserDto userDto = UserDto.builder()
-                .email("test")
+                .email(userDtoForTest.getEmail())
+                .name("modified")
                 .build();
 
         //when
-
-
-//        User expect = userRepository.save(
-//                User.builder()
-//                        .name(userDto.getName())
-//                        .phone(userDto.getPhone())
-//                        .email(userDto.getEmail())
-//                        .password(userDto.getPassword())
-//                        .roles(roles)
-//                        .build()
-//        );
+        userService.update(userDto);
+        User actual = userRepository.findByEmail(userDto.getEmail());
 
         //then
+        org.assertj.core.api.Assertions.assertThat(actual.getName()).isEqualTo(userDto.getName());
     }
 
 
