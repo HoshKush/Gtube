@@ -8,6 +8,7 @@ import com.genesislab.gtube.repository.UserRepository;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.User.UserBuilder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -26,18 +27,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void save(UserDto userDto) {
-        Set<Role> roles = userDto.getRoles().stream()
-                .map(roleRepository::findByName)
-                .collect(Collectors.toSet());
-
         userRepository.save(
-                User.builder()
-                        .name(userDto.getName())
-                        .phone(userDto.getPhone())
-                        .email(userDto.getEmail())
-                        .password(userDto.getPassword())
-                        .roles(roles)
-                .build()
+                buildEntityFrom(userDto)
         );
     }
 
@@ -54,6 +45,20 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto findById(Long id) {
         return null;
+    }
+
+    public User buildEntityFrom(UserDto dto) {
+        Set<Role> roles = dto.getRoles().stream()
+                .map(roleRepository::findByName)
+                .collect(Collectors.toSet());
+
+        return User.builder()
+                .name(dto.getName())
+                .phone(dto.getPhone())
+                .email(dto.getEmail())
+                .password(dto.getPassword())
+                .roles(roles)
+                .build();
     }
 
 }
