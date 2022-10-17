@@ -2,6 +2,7 @@ package com.genesislab.gtube.service;
 
 import com.genesislab.gtube.dto.UserDto;
 import com.genesislab.gtube.entity.User;
+import com.genesislab.gtube.exception.NoSuchUserException;
 import com.genesislab.gtube.repository.UserRepository;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -34,18 +35,19 @@ public class UserServiceImpl implements UserService {
         User user = findById(userDto.getId());
         if(userDto.getName() != null) user.setName(userDto.getName());
         if(userDto.getPhone() != null) user.setPhone(userDto.getName());
-        if(userDto.getRole() != null) ;
+        if(userDto.getRole() != null) user.setRole(userDto.getRoleAsEnum());
     }
 
     @Override
     public void delete(Long id) {
-
+        User user = findById(id);
+        userRepository.delete(user);
     }
 
     @Override
     public User findById(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+                .orElseThrow(() -> new NoSuchUserException("존재하지 않는 사용자입니다."));
     }
 
     public boolean exists(UserDto userDto) {

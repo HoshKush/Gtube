@@ -2,6 +2,7 @@ package com.genesislab.gtube.service;
 
 import com.genesislab.gtube.dto.UserDto;
 import com.genesislab.gtube.entity.User;
+import com.genesislab.gtube.exception.NoSuchUserException;
 import com.genesislab.gtube.repository.UserRepository;
 import javax.transaction.Transactional;
 import org.junit.jupiter.api.Assertions;
@@ -31,12 +32,9 @@ class UserServiceImplTest {
 
 
     private void createUserForTest() {
-        User test = userRepository.save(
-                User.from(userDtoForTest)
-        );
 
         if(userRepository.findByEmail(userDtoForTest.getEmail()) == null) {
-            userRepository.save(test);
+            userRepository.save(User.from(userDtoForTest));
         }
     }
 
@@ -77,12 +75,29 @@ class UserServiceImplTest {
                 .build();
 
         //when
-        userService.update(userDto);
         User actual = userRepository.findByEmail(userDto.getEmail());
+        userDto.setId(actual.getId());
+        userService.update(userDto);
 
         //then
+        System.out.println(actual);
         org.assertj.core.api.Assertions.assertThat(actual.getName()).isEqualTo(userDto.getName());
     }
+
+    @Test
+    @Transactional
+    void 회원삭제_성공() throws Exception{
+        //given
+        Long id = userRepository.findByEmail(userDtoForTest.getEmail()).getId();
+
+        //when
+        userService.delete(id);
+
+        //then
+        org.assertj.core.api.Assertions.assertThatExceptionOfType(NoSuchUserException.class)
+                .isThrownBy(() -> userService.findById(id));
+    }
+
 
 
 
