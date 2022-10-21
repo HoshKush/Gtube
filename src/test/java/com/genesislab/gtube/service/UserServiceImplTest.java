@@ -1,6 +1,6 @@
 package com.genesislab.gtube.service;
 
-import com.genesislab.gtube.dto.UserDto;
+import com.genesislab.gtube.model.dto.UserDto;
 import com.genesislab.gtube.entity.User;
 import com.genesislab.gtube.exception.NoSuchUserException;
 import com.genesislab.gtube.repository.UserRepository;
@@ -21,7 +21,7 @@ class UserServiceImplTest {
                     .email("test")
                     .name("2222")
                     .phone("3333")
-                    .password("4444")
+                    .oauthId("test")
                     .role("USER")
                     .build();
 
@@ -46,7 +46,7 @@ class UserServiceImplTest {
                 .email("1112")
                 .name("2222")
                 .phone("3333")
-                .password("4444")
+                .oauthId("5555")
                 .role("USER")
                 .build();
 
@@ -60,7 +60,7 @@ class UserServiceImplTest {
             if(!userDto.getEmail().equals(actual.getEmail())) return false;
             if(!userDto.getName().equals(actual.getName())) return false;
             if(!userDto.getPhone().equals(actual.getPhone())) return false;
-            if(!userDto.getPassword().equals(actual.getPassword())) return false;
+            if(!userDto.getOauthId().equals(actual.getOauthId())) return false;
             return true;
         });
     }

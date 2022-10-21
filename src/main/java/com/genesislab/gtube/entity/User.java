@@ -1,6 +1,6 @@
 package com.genesislab.gtube.entity;
 
-import com.genesislab.gtube.dto.UserDto;
+import com.genesislab.gtube.model.dto.UserDto;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -26,7 +26,7 @@ public class User {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String password;
+    private String oauthId;
 
     @Column(unique = true)
     private String email;
@@ -38,19 +38,12 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-//    @ManyToMany
-//    @JoinTable(name = "USERS_ROLES",
-//        joinColumns = @JoinColumn(name = "USER_ID"),
-//        inverseJoinColumns = @JoinColumn(name = "ROLE_ID")
-//    )
-//    private List<Role> roles;
-
     public static User from(UserDto userDto) {
         return User.builder()
+                .oauthId(userDto.getOauthId())
                 .email(userDto.getEmail())
                 .phone(userDto.getPhone())
                 .name(userDto.getName())
-                .password(userDto.getPassword())
                 .role(userDto.getRoleAsEnum())
                 .build();
     }

@@ -1,4 +1,4 @@
-package com.genesislab.gtube.dto;
+package com.genesislab.gtube.model.dto;
 
 import com.genesislab.gtube.entity.Role;
 import lombok.Builder;
@@ -8,7 +8,7 @@ import lombok.Data;
 @Builder
 public class UserDto {
     private Long id;
-    private String password;
+    private String oauthId;
     private String email;
     private String name;
     private String phone;
